@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import '../constants.dart';
-import '../widgets/custom_button.dart';
-import '../widgets/custom_icons.dart';
-import '../widgets/custom_text_field.dart';
+import 'package:notes/constants.dart';
+import 'package:notes/widgets/custom_button.dart';
+import 'package:notes/widgets/custom_icons.dart';
+import 'package:notes/widgets/password_text_field.dart';
+import 'package:notes/widgets/custom_text_field.dart';
+
 import 'notes_list_page.dart';
 
 class SignupPage extends StatefulWidget {
@@ -26,7 +28,10 @@ class _SignupPageState extends State<SignupPage> {
         password: _passwordController.text.trim(),
       );
 
-      if (userCredential.user != null) {
+      // تحقق من المستخدم الحالي
+      final user = userCredential.user;
+      if (user != null) {
+        // الانتقال لصفحة الملاحظات بعد التسجيل
         Navigator.pushReplacementNamed(context, NotesListPage.id);
       }
     } on FirebaseAuthException catch (e) {
@@ -124,11 +129,9 @@ class _SignupPageState extends State<SignupPage> {
                   suffixIcon: const Icon(Icons.mail_outlined),
                 ),
                 const SizedBox(height: 16),
-                CustomTextField(
+                PasswordTextField(
                   controller: _passwordController,
-                  label: 'Password',
                   hint: 'Enter your password',
-                  suffixIcon: const Icon(Icons.lock_outlined),
                 ),
                 const SizedBox(height: 30),
                 GestureDetector(

@@ -4,6 +4,7 @@ import '../constants.dart';
 import '../widgets/custom_button.dart';
 import '../widgets/custom_icons.dart';
 import '../widgets/custom_text_field.dart';
+import '../widgets/password_text_field.dart';
 import 'signup_page.dart';
 import 'notes_list_page.dart';
 
@@ -124,11 +125,9 @@ class _LoginPageState extends State<LoginPage> {
                   suffixIcon: const Icon(Icons.mail_outlined),
                 ),
                 const SizedBox(height: 16),
-                CustomTextField(
+                PasswordTextField(
                   controller: _passwordController,
-                  label: 'Password',
                   hint: 'Enter your password',
-                  suffixIcon: const Icon(Icons.lock_outlined),
                 ),
                 const SizedBox(height: 30),
                 GestureDetector(
