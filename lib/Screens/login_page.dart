@@ -1,17 +1,55 @@
 import 'package:flutter/material.dart';
-import 'package:notes/Screens/signup_page.dart';
-import 'package:notes/constants.dart';
-import 'package:notes/widgets/custom_button.dart';
-import 'package:notes/widgets/custom_icons.dart';
-import 'package:notes/widgets/custom_text_field.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../constants.dart';
+import '../widgets/custom_button.dart';
+import '../widgets/custom_icons.dart';
+import '../widgets/custom_text_field.dart';
+import 'signup_page.dart';
+import 'notes_list_page.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({Key? key}) : super(key: key);
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+  static const String id = 'LoginPage';
 
-  void _handleLogin(BuildContext context) {
-    // For now, just navigate to notes list
-    // Later you can add actual authentication logic here
-    Navigator.pushReplacementNamed(context, 'NotesListPage');
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  void _handleLogin() async {
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      if (userCredential.user != null) {
+        Navigator.pushReplacementNamed(context, NotesListPage.id);
+      }
+    } on FirebaseAuthException catch (e) {
+      String message = '';
+      if (e.code == 'user-not-found') {
+        message = 'No user found for that email.';
+      } else if (e.code == 'wrong-password') {
+        message = 'Wrong password provided.';
+      } else {
+        message = e.message ?? 'An error occurred';
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   @override
@@ -65,7 +103,7 @@ class LoginPage extends StatelessWidget {
           ),
           const SizedBox(height: 42),
           Padding(
-            padding: const EdgeInsets.only(right: 16, left: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -79,20 +117,22 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 18),
-                const CustomTextField(
+                CustomTextField(
+                  controller: _emailController,
                   label: 'Email',
                   hint: 'Enter your email',
-                  suffixIcon: Icon(Icons.mail_outlined),
+                  suffixIcon: const Icon(Icons.mail_outlined),
                 ),
                 const SizedBox(height: 16),
-                const CustomTextField(
+                CustomTextField(
+                  controller: _passwordController,
                   label: 'Password',
                   hint: 'Enter your password',
-                  suffixIcon: Icon(Icons.lock_outlined),
+                  suffixIcon: const Icon(Icons.lock_outlined),
                 ),
                 const SizedBox(height: 30),
                 GestureDetector(
-                  onTap: () => _handleLogin(context),
+                  onTap: _handleLogin,
                   child: const CustomButton(btnName: 'LOGIN'),
                 ),
                 const SizedBox(height: 22),
@@ -114,17 +154,9 @@ class LoginPage extends StatelessWidget {
               const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CustomIcons(
-                    iconType: 'apple',
-                    size: 31,
-                    // onTap: _signInWithApple,
-                  ),
+                  CustomIcons(iconType: 'apple', size: 31),
                   SizedBox(width: 20),
-                  CustomIcons(
-                    iconType: 'google',
-                    size: 42,
-                    // onTap: _signInWithGoogle,
-                  ),
+                  CustomIcons(iconType: 'google', size: 42),
                 ],
               ),
               const SizedBox(height: 20),

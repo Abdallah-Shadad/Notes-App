@@ -1,29 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:notes/Screens/login_page.dart';
-import 'package:notes/Screens/signup_page.dart';
-import 'package:notes/Screens/notes_list_page.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'screens/login_page.dart';
+import 'screens/signup_page.dart';
+import 'screens/notes_list_page.dart';
 
-void main() {
-  runApp(const NotesApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(const MyApp());
 }
 
-class NotesApp extends StatelessWidget {
-  const NotesApp({Key? key}) : super(key: key);
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
       title: 'Notes App',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
-        useMaterial3: true,
-      ),
-      initialRoute: '/',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(primarySwatch: Colors.blue),
+      initialRoute: LoginPage.id,
       routes: {
-        '/': (context) => const LoginPage(),
-        'SignupPage': (context) => SignupPage(),
-        'NotesListPage': (context) => const NotesListPage(),
+        LoginPage.id: (context) => const LoginPage(),
+        SignupPage.id: (context) => const SignupPage(),
+        NotesListPage.id: (context) => const NotesListPage(),
       },
     );
   }

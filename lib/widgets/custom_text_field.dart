@@ -1,36 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:notes/constants.dart';
 
 class CustomTextField extends StatelessWidget {
-  const CustomTextField({
-    super.key,
-    required this.label,
-    required this.hint,
-    required this.suffixIcon,
-  });
+  final TextEditingController controller;
   final String label;
   final String hint;
-  final Icon suffixIcon;
+  final Widget? suffixIcon;
+
+  const CustomTextField({
+    super.key,
+    required this.controller,
+    required this.label,
+    required this.hint,
+    this.suffixIcon,
+  });
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: controller,
       decoration: InputDecoration(
-        border: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-        ),
-        hintText: hint,
-        hintStyle: const TextStyle(
-          color: Color.fromARGB(255, 119, 119, 119),
-          fontFamily: 'Roboto',
-        ),
         labelText: label,
-        labelStyle: const TextStyle(
-          color: kPrimaryColor,
-          fontWeight: FontWeight.bold,
-          fontFamily: 'Roboto',
-        ),
+        hintText: hint,
         suffixIcon: suffixIcon,
+        border: const OutlineInputBorder(),
       ),
     );
   }

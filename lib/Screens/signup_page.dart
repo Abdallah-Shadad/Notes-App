@@ -1,12 +1,56 @@
 import 'package:flutter/material.dart';
-import 'package:notes/constants.dart';
-import 'package:notes/widgets/custom_button.dart';
-import 'package:notes/widgets/custom_icons.dart';
-import 'package:notes/widgets/custom_text_field.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../constants.dart';
+import '../widgets/custom_button.dart';
+import '../widgets/custom_icons.dart';
+import '../widgets/custom_text_field.dart';
+import 'notes_list_page.dart';
 
-class SignupPage extends StatelessWidget {
-   const SignupPage({super.key});
-  static String id='SignupPage';
+class SignupPage extends StatefulWidget {
+  const SignupPage({super.key});
+  static const String id = 'SignupPage';
+
+  @override
+  State<SignupPage> createState() => _SignupPageState();
+}
+
+class _SignupPageState extends State<SignupPage> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  void _handleSignUp() async {
+    try {
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      if (userCredential.user != null) {
+        Navigator.pushReplacementNamed(context, NotesListPage.id);
+      }
+    } on FirebaseAuthException catch (e) {
+      String message = '';
+      if (e.code == 'email-already-in-use') {
+        message = 'This email is already registered.';
+      } else if (e.code == 'weak-password') {
+        message = 'Password is too weak.';
+      } else {
+        message = e.message ?? 'An error occurred';
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,27 +58,22 @@ class SignupPage extends StatelessWidget {
       body: ListView(
         padding: EdgeInsets.zero,
         children: [
+          // Header
           Container(
             height: 320,
             width: double.infinity,
             decoration: const BoxDecoration(
               color: kPrimaryColor,
               borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(60),
-                  bottomRight: Radius.circular(60)),
+                bottomLeft: Radius.circular(60),
+                bottomRight: Radius.circular(60),
+              ),
             ),
             child: Column(
               children: [
-                const SizedBox(
-                  height: 50,
-                ),
-                Image.asset(
-                  'assets/images/notes3.png',
-                  width: 150,
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
+                const SizedBox(height: 50),
+                Image.asset('assets/images/notes3.png', width: 150),
+                const SizedBox(height: 5),
                 const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -47,9 +86,7 @@ class SignupPage extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(
-                      width: 5,
-                    ),
+                    SizedBox(width: 5),
                     Text(
                       'APP',
                       style: TextStyle(
@@ -60,19 +97,17 @@ class SignupPage extends StatelessWidget {
                       ),
                     ),
                   ],
-                )
+                ),
               ],
             ),
           ),
-          const SizedBox(
-            height: 42,
-          ),
-          const Padding(
-            padding: EdgeInsets.only(right: 16, left: 16),
+          const SizedBox(height: 42),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'SIGN UP',
                   style: TextStyle(
                     fontFamily: 'Roboto',
@@ -81,29 +116,26 @@ class SignupPage extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(
-                  height: 18,
-                ),
+                const SizedBox(height: 18),
                 CustomTextField(
+                  controller: _emailController,
                   label: 'Email',
                   hint: 'Enter your email',
-                  suffixIcon: Icon(Icons.mail_outlined),
+                  suffixIcon: const Icon(Icons.mail_outlined),
                 ),
-                SizedBox(
-                  height: 16,
-                ),
+                const SizedBox(height: 16),
                 CustomTextField(
+                  controller: _passwordController,
                   label: 'Password',
                   hint: 'Enter your password',
-                  suffixIcon: Icon(Icons.mail_outlined),
+                  suffixIcon: const Icon(Icons.lock_outlined),
                 ),
-                SizedBox(
-                  height: 30,
+                const SizedBox(height: 30),
+                GestureDetector(
+                  onTap: _handleSignUp,
+                  child: const CustomButton(btnName: 'SIGN UP'),
                 ),
-                CustomButton(btnName: 'SIGN UP'),
-                SizedBox(
-                  height: 22,
-                ),
+                const SizedBox(height: 22),
               ],
             ),
           ),
@@ -122,17 +154,9 @@ class SignupPage extends StatelessWidget {
               const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CustomIcons(
-                    iconType: 'apple',
-                    size: 31,
-                    // onTap: _signInWithApple,
-                  ),
+                  CustomIcons(iconType: 'apple', size: 31),
                   SizedBox(width: 20),
-                  CustomIcons(
-                    iconType: 'google',
-                    size: 42,
-                    // onTap: _signInWithGoogle,
-                  ),
+                  CustomIcons(iconType: 'google', size: 42),
                 ],
               ),
               const SizedBox(height: 20),
@@ -140,10 +164,8 @@ class SignupPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    'Don\'t have an account?  ',
-                    style: TextStyle(
-                      color: kPrimaryColor,
-                    ),
+                    'Already have an account?  ',
+                    style: TextStyle(color: kPrimaryColor),
                   ),
                   GestureDetector(
                     onTap: () {
@@ -160,7 +182,7 @@ class SignupPage extends StatelessWidget {
                 ],
               ),
             ],
-          )
+          ),
         ],
       ),
     );
